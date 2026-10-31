@@ -162,3 +162,4 @@ export const GAME_CONFIG = Object.freeze({
   MAX_PARTICLES: 150,
   CONFIDENCE_AUTO_THRESHOLD: 0.90,
 });
+

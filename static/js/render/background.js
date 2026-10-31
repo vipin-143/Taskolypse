@@ -126,3 +126,4 @@ export class ParallaxBackground {
     ctx.setLineDash([]);
   }
 }
+

@@ -203,3 +203,4 @@ test("Powerups: purchase, EMP timer, City Shield, Auto-Turret", () => {
   assert.equal(autoTargets.length, 1);
   assert.equal(autoTargets[0].filename, "high.pdf");
 });
+

@@ -197,3 +197,4 @@ export class AudioSynthesizer {
     osc.stop(now + 0.42);
   }
 }
+

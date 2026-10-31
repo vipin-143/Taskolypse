@@ -88,3 +88,4 @@ export function calculateWaveClearBonus(wave, cityHealth, combo) {
   const comboBonus = combo * 50;
   return Math.round((baseBonus + comboBonus) * healthMultiplier);
 }
+

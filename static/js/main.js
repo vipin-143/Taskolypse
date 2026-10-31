@@ -522,3 +522,4 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
   requestAnimationFrame(gameLoop);
 });
+
