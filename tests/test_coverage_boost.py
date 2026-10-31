@@ -124,3 +124,44 @@ def test_api_index_and_demo_auto_provision(monkeypatch: pytest.MonkeyPatch, tmp_
     resolved = validate_and_resolve_root("demo")
     assert resolved.exists()
     assert resolved.is_dir()
+
+
+@pytest.mark.asyncio
+async def test_vercel_path_middleware_query_and_headers() -> None:
+    """Test VercelPathMiddleware correctly restores path from query and headers."""
+    from api.index import VercelPathMiddleware
+
+    recorded: dict[str, object] = {}
+
+    class MockApp:
+        async def __call__(self, scope: dict, receive: object, send: object) -> None:
+            recorded["path"] = scope.get("path")
+            recorded["query_string"] = scope.get("query_string")
+
+    mw = VercelPathMiddleware(MockApp())
+
+    # Case 1: __path query parameter
+    s1 = {"type": "http", "path": "/api/index.py", "query_string": b"__path=/static/style.css&test=1"}
+    await mw(s1, None, None)
+    assert recorded["path"] == "/static/style.css"
+    assert recorded["query_string"] == b"test=1"
+
+    # Case 2: x-invoke-path header
+    s2 = {
+        "type": "http",
+        "path": "/api/index.py",
+        "query_string": b"",
+        "headers": [(b"x-invoke-path", b"/static/js/main.js")],
+    }
+    await mw(s2, None, None)
+    assert recorded["path"] == "/static/js/main.js"
+
+    # Case 3: Root fallback
+    s3 = {"type": "http", "path": "/api/index.py", "query_string": b"", "headers": []}
+    await mw(s3, None, None)
+    assert recorded["path"] == "/"
+
+    # Test root /style.css endpoint
+    res_css = client.get("/style.css")
+    assert res_css.status_code == 200
+    assert "text/css" in res_css.headers.get("content-type", "")

@@ -230,8 +230,11 @@ STATIC_DIRS = [
 
 def find_static_file(relative_name: str) -> Path | None:
     """Find a static file across potential local and serverless paths."""
+    cleaned = relative_name.lstrip("/")
+    if cleaned.startswith("static/"):
+        cleaned = cleaned[len("static/") :]
     for base in STATIC_DIRS:
-        target = (base / relative_name).resolve()
+        target = (base / cleaned).resolve()
         if target.exists() and target.is_file():
             return target
     return None
@@ -260,6 +263,12 @@ def serve_static(file_path: str) -> Response:
         media_type=media_type,
         headers={"Cache-Control": "public, max-age=3600"},
     )
+
+
+@app.get("/style.css")
+def serve_root_style() -> Response:
+    """Direct root fallback for stylesheet."""
+    return serve_static("style.css")
 
 
 @app.get("/")
