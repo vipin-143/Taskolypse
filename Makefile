@@ -16,6 +16,7 @@ run:
 	python -m app
 
 test:
+	-node --test tests/js/*.test.js
 	python -m pytest
 
 lint:

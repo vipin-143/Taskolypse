@@ -1,23 +1,23 @@
 /* ==========================================================================
-   Taskocalypse Theme & Stylesheet
+   Taskocalypse: Bunker Defense - Theme & Stylesheet
    Designed for Accessibility (WCAG AA), Responsiveness, and Arcade Feel
    ========================================================================== */
 
 :root {
   --font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  
-  /* WCAG AA High Contrast Color Palette */
-  --bg-dark: #0f141c;
-  --bg-card: #192231;
-  --bg-elevated: #233045;
-  --border-color: #3b4e6d;
-  --text-main: #f0f4fc;
-  --text-muted: #a2b4cf;
-  --text-inverse: #0b0f17;
 
-  /* Accent & Bunker Indicators */
-  --color-primary: #3b82f6;
-  --color-primary-hover: #2563eb;
+  /* High Contrast Dark Palette */
+  --bg-dark: #0b0f17;
+  --bg-card: #131c2a;
+  --bg-elevated: #1e293b;
+  --border-color: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-inverse: #020617;
+
+  /* Primary Brand & Accents */
+  --color-primary: #38bdf8;
+  --color-primary-hover: #0284c7;
   --color-accent: #06b6d4;
   --color-success: #10b981;
   --color-warning: #f59e0b;
@@ -25,7 +25,7 @@
   --color-purple: #a855f7;
   --color-pink: #ec4899;
 
-  /* Bunker specific distinct colors (Colorblind-safe accents) */
+  /* Bunker Distinct Theme Accents */
   --bunker-docs: #38bdf8;
   --bunker-images: #4ade80;
   --bunker-videos: #f472b6;
@@ -35,16 +35,16 @@
   --bunker-trash: #f87171;
   --bunker-keep: #94a3b8;
 
-  --focus-ring: #60a5fa;
+  --focus-ring: #38bdf8;
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.875rem;
   --radius-full: 9999px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
-  --transition-speed: 0.18s;
+  --transition-speed: 0.16s;
 }
 
 /* Reset & Box Sizing */
@@ -99,7 +99,7 @@ body {
   border: 0;
 }
 
-/* Focus Indicators */
+/* Accessible Focus Indicators */
 :focus-visible {
   outline: 3px solid var(--focus-ring);
   outline-offset: 2px;
@@ -134,7 +134,7 @@ body {
 }
 
 .brand h1 {
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   color: #fff;
@@ -158,11 +158,10 @@ body {
   flex: 1;
   max-width: 1100px;
   width: 100%;
-  margin: 1.5rem auto;
+  margin: 1.25rem auto;
   padding: 0 1rem;
 }
 
-/* View Panels */
 .view-panel {
   display: block;
 }
@@ -171,7 +170,7 @@ body {
   display: none !important;
 }
 
-/* Generic Card */
+/* Card */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -180,7 +179,6 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-/* Setup Card */
 .setup-card {
   max-width: 680px;
   margin: 1rem auto;
@@ -196,7 +194,7 @@ body {
 
 .subtitle {
   color: var(--text-muted);
-  font-size: 0.98rem;
+  font-size: 0.95rem;
   margin-bottom: 1.8rem;
 }
 
@@ -296,6 +294,8 @@ select {
   font-weight: 600;
   border: none;
   border-radius: var(--radius-md);
+  min-height: 44px;
+  min-width: 44px;
   padding: 0.65rem 1.1rem;
   cursor: pointer;
   transition: background-color var(--transition-speed), transform var(--transition-speed);
@@ -307,11 +307,13 @@ select {
 
 .btn-primary {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--text-inverse);
+  font-weight: 700;
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-hover);
+  background: #0284c7;
+  color: #fff;
 }
 
 .btn-secondary {
@@ -321,17 +323,7 @@ select {
 }
 
 .btn-secondary:hover {
-  background: #2b3b55;
-}
-
-.btn-accent {
-  background: var(--color-accent);
-  color: var(--text-inverse);
-  font-weight: 700;
-}
-
-.btn-accent:hover {
-  background: #0891b2;
+  background: #334155;
 }
 
 .btn-warning {
@@ -340,18 +332,14 @@ select {
   font-weight: 700;
 }
 
-.btn-warning:hover {
-  background: #d97706;
-}
-
 .btn-large {
   padding: 0.85rem 1.75rem;
   font-size: 1.05rem;
-  letter-spacing: 0.02em;
 }
 
 .btn-sm {
   padding: 0.4rem 0.75rem;
+  min-height: 36px;
   font-size: 0.82rem;
 }
 
@@ -381,35 +369,34 @@ select {
 }
 
 /* ==========================================================================
-   GAMEPLAY ARENA
+   GAME HUD & HEALTH BAR
    ========================================================================== */
 
-/* HUD */
 .game-hud {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.25rem;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 0.85rem;
+  margin-bottom: 0.75rem;
 }
 
 .hud-stat {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1.1rem;
+  padding: 0.65rem 0.95rem;
   display: flex;
   flex-direction: column;
 }
 
 .hud-label {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.06em;
 }
 
 .hud-value {
-  font-size: 1.6rem;
+  font-size: 1.45rem;
   font-weight: 800;
   color: #fff;
 }
@@ -418,78 +405,106 @@ select {
   color: var(--color-warning);
 }
 
-.hud-value.warning {
-  color: var(--color-danger);
-}
-
-.combo-display {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
 .combo-value {
   color: var(--color-pink);
-  transition: transform 0.15s ease-out;
 }
 
-.combo-title {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-pink);
-  text-transform: uppercase;
+.combo-fire {
+  color: #f43f5e;
+  text-shadow: 0 0 10px rgba(244, 63, 94, 0.75);
 }
 
-/* Arena Container & Timer */
-.arena-container {
+.health-stat {
+  justify-content: center;
+}
+
+.health-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
 }
 
-.timer-track {
+.hud-health-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.health-track {
   width: 100%;
-  height: 8px;
-  background: var(--bg-card);
+  height: 10px;
+  background: var(--bg-dark);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
 
-.timer-fill {
+.health-fill {
   height: 100%;
   width: 100%;
-  background: var(--color-accent);
-  transition: width 0.05s linear;
+  background: linear-gradient(90deg, #ef4444 0%, #f59e0b 40%, #10b981 100%);
+  transition: width 0.15s ease-out;
 }
 
-.timer-fill.timer-warning {
-  background: var(--color-danger);
-}
+/* ==========================================================================
+   CANVAS ARENA
+   ========================================================================== */
 
-/* File Card */
-.file-card {
-  background: var(--bg-card);
+.canvas-arena-wrapper {
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  background: #020617;
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 1.5rem 1.75rem;
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
-  transition: transform var(--transition-speed);
+  margin-bottom: 0.85rem;
 }
 
-.file-card-header {
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ==========================================================================
+   TARGET ENEMY CARD (DOM MIRRORING FOR ACCESSIBILITY)
+   ========================================================================== */
+
+.target-card {
+  background: var(--bg-card);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
+}
+
+.target-card-main {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.file-icon {
-  font-size: 2.25rem;
+.target-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  letter-spacing: 0.08em;
 }
 
-.file-meta-header {
+.target-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  word-break: break-all;
+  margin: 0.2rem 0 0.4rem 0;
+}
+
+.target-meta {
   display: flex;
   gap: 0.5rem;
 }
@@ -497,97 +512,56 @@ select {
 .badge {
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
-  padding: 0.2rem 0.55rem;
+  padding: 0.2rem 0.6rem;
   border-radius: var(--radius-sm);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
 }
 
-.badge-warning {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: var(--color-danger);
-  color: #fca5a5;
-}
-
-.file-name {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #fff;
-  word-break: break-all;
-  margin-bottom: 0.5rem;
-}
-
-.file-details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.25rem;
-}
-
-.detail-pill {
-  background: var(--bg-elevated);
-  padding: 0.25rem 0.65rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+.badge-muted {
   color: var(--text-muted);
 }
 
-/* AI Suggestion Banner */
-.suggestion-banner {
-  background: rgba(6, 182, 212, 0.08);
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.suggestion-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.target-intel {
+  max-width: 480px;
 }
 
 .suggestion-tag {
-  font-size: 0.72rem;
-  font-weight: 800;
-  color: var(--color-accent);
-  letter-spacing: 0.08em;
-}
-
-.confidence-badge {
-  background: var(--color-accent);
-  color: var(--text-inverse);
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
   font-size: 0.7rem;
   font-weight: 800;
+  color: var(--color-warning);
+  letter-spacing: 0.08em;
+  display: block;
 }
 
-.suggestion-content strong {
+.target-bunker-name {
   font-size: 1.05rem;
   color: #fff;
+  display: block;
+  margin-bottom: 0.2rem;
 }
 
-.suggestion-reason {
+.target-reason {
   font-size: 0.875rem;
   color: var(--text-muted);
 }
 
-/* Bunker Lanes Grid */
+/* ==========================================================================
+   BUNKER LANES GRID (ACTION DOCK)
+   ========================================================================== */
+
 .bunkers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .bunker-btn {
   background: var(--bg-card);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  padding: 0.85rem;
+  min-height: 48px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -603,22 +577,23 @@ select {
   transform: translateY(-2px);
 }
 
-.bunker-btn.suggested-pulse {
+.bunker-btn.suggested-glow {
   border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.6);
+  background: rgba(6, 182, 212, 0.08);
 }
 
 .bunker-key-pill {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
+  top: 0.45rem;
+  left: 0.45rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   color: var(--color-warning);
   font-size: 0.75rem;
   font-weight: 800;
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.35rem;
+  height: 1.35rem;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -626,18 +601,18 @@ select {
 }
 
 .bunker-icon {
-  font-size: 1.75rem;
-  margin-bottom: 0.35rem;
+  font-size: 1.65rem;
+  margin-bottom: 0.25rem;
 }
 
 .bunker-title {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   color: #fff;
 }
 
 .bunker-desc {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
 }
 
@@ -654,7 +629,7 @@ select {
 }
 
 /* ==========================================================================
-   RUN SUMMARY & DRY RUN PLAN
+   SUMMARY & DRY-RUN ACTION PLAN
    ========================================================================== */
 
 .summary-card {
@@ -664,7 +639,7 @@ select {
 
 .summary-banner {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 .summary-badge-icon {
@@ -674,7 +649,7 @@ select {
 }
 
 .summary-banner h2 {
-  font-size: 1.85rem;
+  font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   color: #fff;
@@ -687,39 +662,38 @@ select {
 
 .stats-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
 }
 
 .stat-box {
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 1.25rem 1rem;
+  padding: 1.1rem 0.85rem;
   text-align: center;
 }
 
 .stat-number {
   display: block;
-  font-size: 1.75rem;
+  font-size: 1.65rem;
   font-weight: 800;
   color: var(--color-warning);
 }
 
 .stat-label {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   font-weight: 600;
 }
 
-/* Dry-Run Box & Table */
 .dry-run-box {
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 1.5rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 .dry-run-header {
@@ -784,8 +758,8 @@ select {
 }
 
 .action-move {
-  background: rgba(59, 130, 246, 0.2);
-  color: #93c5fd;
+  background: rgba(56, 189, 248, 0.2);
+  color: #7dd3fc;
 }
 
 .action-quarantine {
@@ -806,7 +780,7 @@ select {
 }
 
 /* ==========================================================================
-   SUCCESS & UNDO CARD
+   SUCCESS CARD & UNDO
    ========================================================================== */
 
 .success-card {
@@ -840,13 +814,8 @@ select {
   gap: 0.85rem;
 }
 
-.undo-box p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
 /* ==========================================================================
-   MODAL DIALOG (ACCESSIBILITY & HOW TO PLAY)
+   ACCESSIBLE MODAL DIALOGS
    ========================================================================== */
 
 .modal-dialog {
@@ -891,7 +860,7 @@ select {
   color: var(--color-accent);
 }
 
-.dialog-body p {
+.dialog-body p, .dialog-body li {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
@@ -899,16 +868,10 @@ select {
 .dialog-body ul {
   padding-left: 1.25rem;
   margin-top: 0.45rem;
-  font-size: 0.9rem;
 }
 
 .dialog-body li {
   margin-bottom: 0.35rem;
-  color: var(--text-muted);
-}
-
-.dialog-body strong {
-  color: var(--text-main);
 }
 
 kbd {
@@ -927,7 +890,6 @@ kbd {
   justify-content: flex-end;
 }
 
-/* Footer */
 .app-footer {
   text-align: center;
   padding: 1.25rem;
@@ -938,7 +900,7 @@ kbd {
 }
 
 /* ==========================================================================
-   MEDIA QUERIES (RESPONSIVENESS & ACCESSIBILITY)
+   RESPONSIVENESS & ACCESSIBILITY MEDIA QUERIES
    ========================================================================== */
 
 @media (max-width: 640px) {
@@ -946,21 +908,23 @@ kbd {
     flex-direction: column;
     align-items: flex-start;
   }
-  
   .tagline {
     display: none;
   }
-  
+  .game-hud {
+    grid-template-columns: 1fr 1fr;
+  }
+  .health-stat {
+    grid-column: span 2;
+  }
   .bunkers-grid {
     grid-template-columns: 1fr 1fr;
   }
-  
   .card {
     padding: 1.25rem;
   }
 }
 
-/* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -969,4 +933,3 @@ kbd {
     scroll-behavior: auto !important;
   }
 }
-

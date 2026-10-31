@@ -16,6 +16,9 @@ switch ($Command) {
         python -m app
     }
     "test" {
+        if (Get-Command node -ErrorAction SilentlyContinue) {
+            node --test tests/js/*.test.js
+        }
         python -m pytest
     }
     "lint" {

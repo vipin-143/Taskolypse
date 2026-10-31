@@ -50,11 +50,16 @@ def create_demo_folder(base_dir: Path | None = None) -> Path:
     old_time = time.time() - (300 * 86400)
     os.utime(old_installer, (old_time, old_time))
 
-    # 7. Exact Duplicates (matching bytes)
+    # 7. Exact Duplicates (standalone duplicate + hydra cluster)
     dup_bytes = b"EXACT_DUPLICATE_REPORT_PAYLOAD_ABC123"
     (target_dir / "monthly_financial_report.pdf").write_bytes(dup_bytes)
     (target_dir / "monthly_financial_report (1).pdf").write_bytes(dup_bytes)
     (target_dir / "monthly_financial_report_copy.pdf").write_bytes(dup_bytes)
+
+    # Standalone duplicate (Glitch Monster)
+    logo_bytes = png_header + b"brand_logo_payload_789"
+    (target_dir / "company_logo.png").write_bytes(logo_bytes)
+    (target_dir / "company_logo (1).png").write_bytes(logo_bytes)
 
     # 8. Empty 0-byte files and temporary junk
     (target_dir / "empty_error.log").write_bytes(b"")
