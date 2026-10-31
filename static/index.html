@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Taskocalypse - Turn the chore of organizing cluttered folders into a fast-paced survival game.">
+  <title>Taskocalypse - Folder Defense</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Accessibility: Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ARIA Live Announcement Region for Screen Readers -->
+  <div id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Header -->
+  <header class="app-header" role="banner">
+    <div class="header-content">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">☣️</span>
+        <h1>TASKOCALYPSE</h1>
+        <span class="tagline">Folder Defense & Real Chore Execution</span>
+      </div>
+
+      <nav class="header-controls" aria-label="Game controls">
+        <button id="btn-sound-toggle" class="btn btn-secondary btn-icon" aria-pressed="true" title="Toggle Sound Effects (M)">
+          <span class="btn-icon-symbol" aria-hidden="true">🔊</span>
+          <span class="btn-label">Sound: ON</span>
+        </button>
+
+        <button id="btn-calm-toggle" class="btn btn-secondary btn-icon" aria-pressed="false" title="Toggle Calm Mode - No Timers (C)">
+          <span class="btn-icon-symbol" aria-hidden="true">🧘</span>
+          <span class="btn-label">Calm Mode: OFF</span>
+        </button>
+
+        <button id="btn-help" class="btn btn-secondary btn-icon" title="How to Play & Safety Guide (?)">
+          <span class="btn-icon-symbol" aria-hidden="true">❓</span>
+          <span class="btn-label">Help</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main id="main-content" class="app-main" role="main">
+
+    <!-- View 1: Setup & Target Folder Selection -->
+    <section id="view-setup" class="view-panel" aria-labelledby="setup-title">
+      <div class="card setup-card">
+        <h2 id="setup-title">DEFEND YOUR FILESYSTEM</h2>
+        <p class="subtitle">
+          Point Taskocalypse at a cluttered folder (e.g. Downloads or Desktop). Every survivor/zombie file you route to a bunker gets queued for real disk reorganization with dry-run safety and 1-click undo.
+        </p>
+
+        <form id="scan-form" class="scan-form">
+          <div class="form-group">
+            <label for="folder-path-input">Folder Path to Clean:</label>
+            <div class="input-with-button">
+              <input
+                type="text"
+                id="folder-path-input"
+                name="folder_path"
+                required
+                placeholder="e.g. D:\Downloads or paste path from demo_setup.py"
+                autocomplete="off"
+                spellcheck="false"
+              >
+              <button type="button" id="btn-use-demo" class="btn btn-secondary" title="Auto-fill path to demo_folder">
+                Use Demo Folder
+              </button>
+            </div>
+            <p class="form-hint">Tip: Run <code>python demo_setup.py</code> in a terminal to spawn an instant fake cluttered folder.</p>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="check-recursive" name="include_subfolders">
+              <span>Include subfolders (recursive scan)</span>
+            </label>
+
+            <div class="speed-select-group">
+              <label for="game-speed-select">Game Pacing:</label>
+              <select id="game-speed-select">
+                <option value="calm">Calm (No countdown timer)</option>
+                <option value="6000" selected>Normal (6s per file)</option>
+                <option value="3500">Fast (3.5s per file)</option>
+                <option value="2000">Insane (2s panic mode)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="btn-start-scan" class="btn btn-primary btn-large">
+              <span aria-hidden="true">🚀</span> Scan & Start Defense
+            </button>
+          </div>
+        </form>
+
+        <div id="scan-error" class="alert alert-error hidden" role="alert"></div>
+      </div>
+    </section>
+
+    <!-- View 2: Active Defense Lane Game -->
+    <section id="view-game" class="view-panel hidden" aria-labelledby="game-stats-heading">
+      <h2 id="game-stats-heading" class="sr-only">Live Game Arena</h2>
+
+      <!-- HUD: Stats & Combo Bar -->
+      <div class="game-hud" role="region" aria-label="Game HUD">
+        <div class="hud-stat">
+          <span class="hud-label">SURVIVORS REMAINING</span>
+          <span id="hud-remaining" class="hud-value">0</span>
+        </div>
+
+        <div class="hud-stat">
+          <span class="hud-label">SCORE</span>
+          <span id="hud-score" class="hud-value highlight">0</span>
+        </div>
+
+        <div class="hud-stat">
+          <span class="hud-label">COMBO</span>
+          <div class="combo-display">
+            <span id="hud-combo" class="hud-value combo-value">x1</span>
+            <span id="hud-combo-title" class="combo-title">READY</span>
+          </div>
+        </div>
+
+        <div class="hud-stat">
+          <span class="hud-label">DUPLICATES DETECTED</span>
+          <span id="hud-duplicates" class="hud-value warning">0</span>
+        </div>
+      </div>
+
+      <!-- Incoming File Card (The Zombie / Survivor) -->
+      <div class="arena-container">
+        <!-- Timer bar -->
+        <div class="timer-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="timer-progressbar">
+          <div id="timer-fill" class="timer-fill"></div>
+        </div>
+
+        <div id="file-card" class="file-card" role="article" aria-label="Incoming File">
+          <div class="file-card-header">
+            <span id="file-icon" class="file-icon" aria-hidden="true">📄</span>
+            <div class="file-meta-header">
+              <span id="file-ext-badge" class="badge">EXT</span>
+              <span id="file-duplicate-badge" class="badge badge-warning hidden">DUPLICATE</span>
+            </div>
+          </div>
+
+          <div class="file-card-body">
+            <h3 id="file-name" class="file-name" title="">filename.ext</h3>
+            <div class="file-details">
+              <span id="file-size" class="detail-pill">0 KB</span>
+              <span id="file-age" class="detail-pill">Modified 0 days ago</span>
+            </div>
+
+            <!-- Context-Aware Suggestion Banner -->
+            <div id="suggestion-banner" class="suggestion-banner">
+              <div class="suggestion-header">
+                <span class="suggestion-tag">AI SCANNER SUGGESTION</span>
+                <span id="suggestion-confidence" class="confidence-badge">95% Match</span>
+              </div>
+              <div class="suggestion-content">
+                <strong id="suggestion-bunker-name">Bunker Name</strong>
+                <p id="suggestion-reason" class="suggestion-reason">Reason description</p>
+              </div>
+              <button id="btn-quick-accept" class="btn btn-accent btn-sm" title="Accept Suggestion (Spacebar or Enter)">
+                Accept Suggestion <kbd>Space</kbd>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bunker Lanes (Actions) -->
+      <section class="bunkers-grid" aria-label="Bunker selection keys">
+        <button class="bunker-btn" data-bunker="Documents" data-key="1">
+          <span class="bunker-key-pill">1</span>
+          <span class="bunker-icon" aria-hidden="true">📄</span>
+          <span class="bunker-title">Documents</span>
+          <span class="bunker-desc">PDFs, Docs, Sheets</span>
+        </button>
+
+        <button class="bunker-btn" data-bunker="Images" data-key="2">
+          <span class="bunker-key-pill">2</span>
+          <span class="bunker-icon" aria-hidden="true">🖼️</span>
+          <span class="bunker-title">Images</span>
+          <span class="bunker-desc">Photos, Screenshots</span>
+        </button>
+
+        <button class="bunker-btn" data-bunker="Videos" data-key="3">
+          <span class="bunker-key-pill">3</span>
+          <span class="bunker-icon" aria-hidden="true">🎬</span>
+          <span class="bunker-title">Videos</span>
+          <span class="bunker-desc">MP4, MOV, Media</span>
+        </button>
+
+        <button class="bunker-btn" data-bunker="Code" data-key="4">
+          <span class="bunker-key-pill">4</span>
+          <span class="bunker-icon" aria-hidden="true">💻</span>
+          <span class="bunker-title">Code</span>
+          <span class="bunker-desc">Scripts, JSON, Source</span>
+        </button>
+
+        <button class="bunker-btn" data-bunker="Archives" data-key="5">
+          <span class="bunker-key-pill">5</span>
+          <span class="bunker-icon" aria-hidden="true">📦</span>
+          <span class="bunker-title">Archives</span>
+          <span class="bunker-desc">ZIP, TAR, 7Z Packages</span>
+        </button>
+
+        <button class="bunker-btn" data-bunker="Installers" data-key="6">
+          <span class="bunker-key-pill">6</span>
+          <span class="bunker-icon" aria-hidden="true">⚙️</span>
+          <span class="bunker-title">Installers</span>
+          <span class="bunker-desc">EXE, MSI, DMG setups</span>
+        </button>
+
+        <button class="bunker-btn bunker-trash" data-bunker="Trash-Quarantine" data-key="7">
+          <span class="bunker-key-pill">7</span>
+          <span class="bunker-icon" aria-hidden="true">☣️</span>
+          <span class="bunker-title">Quarantine</span>
+          <span class="bunker-desc">Duplicates, Logs, Temp</span>
+        </button>
+
+        <button class="bunker-btn bunker-keep" data-bunker="Keep" data-key="8">
+          <span class="bunker-key-pill">8</span>
+          <span class="bunker-icon" aria-hidden="true">🛡️</span>
+          <span class="bunker-title">Keep in Place</span>
+          <span class="bunker-desc">Leave untouched</span>
+        </button>
+      </section>
+    </section>
+
+    <!-- View 3: Run Summary & Dry-Run Review Plan -->
+    <section id="view-summary" class="view-panel hidden" aria-labelledby="summary-title">
+      <div class="card summary-card">
+        <div class="summary-banner">
+          <span class="summary-badge-icon" aria-hidden="true">🏆</span>
+          <h2 id="summary-title">RUN COMPLETE - APOCALYPSE CONTAINED!</h2>
+          <p class="summary-subtitle">Review your queued action plan below before applying changes to disk.</p>
+        </div>
+
+        <div class="stats-summary-grid">
+          <div class="stat-box">
+            <span class="stat-number" id="sum-sorted">0</span>
+            <span class="stat-label">Files Sorted</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number" id="sum-quarantined">0</span>
+            <span class="stat-label">Quarantined / Junk</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number" id="sum-saved">0 MB</span>
+            <span class="stat-label">Space Organized</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-number" id="sum-score">0</span>
+            <span class="stat-label">Final Score</span>
+          </div>
+        </div>
+
+        <div class="dry-run-box">
+          <div class="dry-run-header">
+            <h3>Dry-Run Preview (Safety Verification)</h3>
+            <span class="safety-indicator">🔒 Disk Untouched</span>
+          </div>
+          <p class="dry-run-description">
+            Taskocalypse never deletes files permanently. Quarantined files are moved to <code>.taskocalypse_quarantine/</code> inside the folder. On name collisions, files are safely renamed with <code>(1)</code>.
+          </p>
+
+          <div class="table-responsive">
+            <table class="plan-table" aria-label="Action plan table">
+              <thead>
+                <tr>
+                  <th scope="col">Action</th>
+                  <th scope="col">Source File</th>
+                  <th scope="col">Target Destination</th>
+                  <th scope="col">Size</th>
+                </tr>
+              </thead>
+              <tbody id="plan-items-tbody">
+                <!-- Dynamically populated safely via textContent -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="summary-actions">
+          <button id="btn-execute-plan" class="btn btn-primary btn-large">
+            <span aria-hidden="true">⚡</span> Execute Plan on Disk
+          </button>
+          <button id="btn-discard-plan" class="btn btn-secondary">
+            Discard & Return
+          </button>
+        </div>
+
+        <div id="exec-feedback" class="alert hidden" role="alert"></div>
+      </div>
+    </section>
+
+    <!-- View 4: Post-Execution & Undo -->
+    <section id="view-success" class="view-panel hidden" aria-labelledby="success-title">
+      <div class="card success-card">
+        <span class="success-icon" aria-hidden="true">🎉</span>
+        <h2 id="success-title">Files Reorganized Successfully!</h2>
+        <p id="success-message">Your folder has been cleaned and sorted according to your gameplay decisions.</p>
+
+        <div class="undo-box">
+          <p>Made a mistake? You can instantly revert this run right now.</p>
+          <button id="btn-undo-run" class="btn btn-warning btn-large">
+            <span aria-hidden="true">↩️</span> Undo This Run (Press Z)
+          </button>
+        </div>
+
+        <div class="finish-actions">
+          <button id="btn-play-again" class="btn btn-primary">
+            Clean Another Folder
+          </button>
+        </div>
+
+        <div id="undo-feedback" class="alert hidden" role="alert"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Help & Safety Modal Dialog -->
+  <dialog id="help-dialog" class="modal-dialog" aria-labelledby="help-title">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <h2 id="help-title">How to Play & Safety Architecture</h2>
+        <button id="btn-close-help" class="btn btn-secondary btn-sm" aria-label="Close dialog">✕</button>
+      </div>
+      <div class="dialog-body">
+        <h3>Game Objective</h3>
+        <p>Your messy files arrive one by one as apocalypse survivors/mutants. Your task is to route each file to its safest bunker before the countdown expires!</p>
+
+        <h3>Controls</h3>
+        <ul>
+          <li><kbd>1</kbd> - <strong>Documents</strong> (PDF, Word, Spreadsheets)</li>
+          <li><kbd>2</kbd> - <strong>Images</strong> (Photos, Screenshots)</li>
+          <li><kbd>3</kbd> - <strong>Videos</strong> (Clips, Recordings)</li>
+          <li><kbd>4</kbd> - <strong>Code</strong> (Python, JS, Configs)</li>
+          <li><kbd>5</kbd> - <strong>Archives</strong> (ZIP, TAR, 7Z)</li>
+          <li><kbd>6</kbd> - <strong>Installers</strong> (Setups, Executables)</li>
+          <li><kbd>7</kbd> - <strong>Quarantine</strong> (Duplicates, Temp, 0-byte logs)</li>
+          <li><kbd>8</kbd> - <strong>Keep in Place</strong> (Leaves file untouched)</li>
+          <li><kbd>Space</kbd> or <kbd>Enter</kbd> - <strong>Accept AI Suggestion</strong></li>
+          <li><kbd>C</kbd> - <strong>Toggle Calm Mode</strong> (No timers)</li>
+          <li><kbd>M</kbd> - <strong>Toggle Sound Effects</strong></li>
+          <li><kbd>Z</kbd> - <strong>Undo Last Run</strong> (When execution completes)</li>
+        </ul>
+
+        <h3>Safety Guarantees</h3>
+        <ul>
+          <li><strong>No Permanent Deletion:</strong> "Quarantine" moves files to <code>.taskocalypse_quarantine/</code> inside the selected folder. Nothing is destroyed.</li>
+          <li><strong>Dry-Run First:</strong> No files are modified on disk during gameplay. You inspect the full plan at the end and must explicitly confirm before execution.</li>
+          <li><strong>Collision-Safe:</strong> Never overwrites existing files. If a filename collision occurs, a safe counter suffix like <code>(1)</code> is added.</li>
+          <li><strong>1-Click Undo:</strong> Every run writes a journal. Click "Undo" or press <kbd>Z</kbd> to return every file to its exact origin.</li>
+        </ul>
+      </div>
+      <div class="dialog-footer">
+        <button id="btn-dismiss-help" class="btn btn-primary">Got It!</button>
+      </div>
+    </div>
+  </dialog>
+
+  <footer class="app-footer">
+    <p>Taskocalypse &bull; Built with Python FastAPI, Vanilla JS &amp; CSS &bull; Localhost Confinement</p>
+  </footer>
+
+  <script src="/static/game.js"></script>
+</body>
+</html>
