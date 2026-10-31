@@ -263,6 +263,9 @@ def serve_static(file_path: str) -> Response:
 
 
 @app.get("/")
+@app.get("/api/index.py")
+@app.get("/api/index")
+@app.get("/api")
 def serve_index() -> Response:
     """Serve single-page frontend application."""
     target = find_static_file("index.html")
