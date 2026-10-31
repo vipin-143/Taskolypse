@@ -233,3 +233,4 @@ def serve_index() -> FileResponse:
     if not index_file.exists():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Frontend not found.")
     return FileResponse(str(index_file))
+

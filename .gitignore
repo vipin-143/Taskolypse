@@ -38,3 +38,7 @@ history_overrides.json
 .DS_Store
 Thumbs.db
 desktop.ini
+
+
+Taskocalypse.zip
+*.zip

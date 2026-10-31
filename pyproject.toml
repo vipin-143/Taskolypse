@@ -36,3 +36,4 @@ minversion = "8.0"
 testpaths = ["tests"]
 addopts = "-v --cov=app --cov-report=term-missing --cov-fail-under=85"
 python_files = ["test_*.py"]
+
