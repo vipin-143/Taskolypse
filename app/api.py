@@ -15,7 +15,6 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import (
     HOST,
-    PORT,
     RATE_LIMIT_MUTATION_MAX_REQUESTS,
     RATE_LIMIT_MUTATION_WINDOW_SECONDS,
 )
@@ -47,13 +46,10 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Strict CORS: localhost only
+# CORS: allow localhost and Vercel domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        f"http://127.0.0.1:{PORT}",
-        f"http://localhost:{PORT}",
-    ],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|.*\.vercel\.app)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
@@ -65,8 +61,10 @@ async def security_headers_middleware(request: Request, call_next: Any) -> Respo
     """Inject strict security headers into all responses."""
     response: Response = await call_next(request)
     response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data:; connect-src 'self';"
+        "default-src 'self' 'unsafe-inline' https:; "
+        "script-src 'self' 'unsafe-inline' https:; "
+        "style-src 'self' 'unsafe-inline' https:; "
+        "img-src 'self' data: https:; connect-src 'self' https:;"
     )
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
@@ -97,7 +95,11 @@ def verify_csrf(token: str | None) -> None:
 
 def check_rate_limit(request: Request) -> None:
     """Enforce sliding-window rate limit on mutating operations."""
-    client_ip = request.client.host if request.client else "127.0.0.1"
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        client_ip = forwarded.split(",")[0].strip()
+    else:
+        client_ip = request.client.host if request.client else "127.0.0.1"
     now = time.time()
     timestamps = _MUTATION_TIMESTAMPS[client_ip]
 
@@ -222,6 +224,9 @@ def override_feedback_endpoint(payload: OverrideFeedbackRequest) -> dict[str, st
 
 # Mount static files and landing page
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
+if not STATIC_DIR.exists():
+    STATIC_DIR = Path.cwd() / "static"
+
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
@@ -233,4 +238,3 @@ def serve_index() -> FileResponse:
     if not index_file.exists():
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Frontend not found.")
     return FileResponse(str(index_file))
-

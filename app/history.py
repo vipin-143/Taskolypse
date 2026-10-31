@@ -4,17 +4,26 @@ from __future__ import annotations
 
 import contextlib
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
 from app.config import HISTORY_FILE_PATH
 
 
+def get_default_history_path() -> Path:
+    """Return appropriate history path depending on deployment environment."""
+    if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+        return Path(tempfile.gettempdir()) / "history_overrides.json"
+    return HISTORY_FILE_PATH
+
+
 class HistoryManager:
     """Persists and retrieves user bunker override decisions."""
 
-    def __init__(self, file_path: Path = HISTORY_FILE_PATH) -> None:
-        self.file_path = file_path
+    def __init__(self, file_path: Path | None = None) -> None:
+        self.file_path = file_path if file_path is not None else get_default_history_path()
 
     def _read_data(self) -> dict[str, dict[str, int]]:
         """Read override counts from disk."""

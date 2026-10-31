@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.api import app, generate_csrf_token
@@ -107,3 +108,19 @@ def test_api_execute_and_undo_error_branches(tmp_path: Path) -> None:
     data = res.json()
     assert data["success"] is False
     assert len(data["failed_items"]) == 1
+
+
+def test_api_index_and_demo_auto_provision(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Test api.index ASGI import and demo auto-provisioning for cloud/Vercel."""
+    from api.index import app as index_app
+
+    assert index_app is not None
+
+    # Test demo auto-provisioning in scanner
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setattr("tempfile.gettempdir", lambda: str(tmp_path))
+    from app.scanner import validate_and_resolve_root
+
+    resolved = validate_and_resolve_root("demo")
+    assert resolved.exists()
+    assert resolved.is_dir()

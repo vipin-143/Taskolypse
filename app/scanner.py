@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import mimetypes
 import os
+import tempfile
 from collections.abc import Generator
 from pathlib import Path
 
@@ -30,12 +31,25 @@ def validate_and_resolve_root(folder_path: str) -> Path:
     """Validate and resolve the target root directory.
 
     Rejects paths containing traversal tricks, non-existent directories,
-    or files that are not directories.
+    or files that are not directories. Also supports automatic virtual demo
+    creation for cloud/serverless deployments (e.g. Vercel).
     """
     if not folder_path or not folder_path.strip():
         raise PathSecurityError("Folder path cannot be empty.")
 
-    raw_path = Path(folder_path)
+    cleaned = folder_path.strip()
+    # Cloud / Demo Auto-Provisioning
+    if cleaned.lower() in {"demo", "demo_folder", "demo-folder", "/tmp/demo_folder"}:
+        is_cloud = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+        base_dir = Path(tempfile.gettempdir()) if is_cloud else Path.cwd()
+        demo_dir = base_dir / "demo_folder"
+        if not demo_dir.exists() or len(list(demo_dir.glob("*"))) == 0:
+            from demo_setup import create_demo_folder
+
+            create_demo_folder(base_dir=base_dir)
+        return demo_dir.resolve()
+
+    raw_path = Path(cleaned)
     try:
         resolved = raw_path.resolve(strict=True)
     except (FileNotFoundError, RuntimeError) as err:

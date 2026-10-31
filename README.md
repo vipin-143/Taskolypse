@@ -117,6 +117,21 @@ make run
 
 ---
 
+## 4.1. Deploying Online to Vercel
+
+Taskocalypse is fully configured for zero-config **Vercel Serverless** deployment:
+- **`vercel.json`**: Configures Python Serverless builds and rewrites all routes to `api/index.py`.
+- **`api/index.py`**: Exports the FastAPI ASGI application.
+- **Cloud Virtual Sandbox**: In serverless environments (where local disk access is restricted), entering `demo_folder` or clicking "Use Demo Folder" auto-provisions a simulated cluttered filesystem in `/tmp/demo_folder`. Visitors can play, sort, dry-run, execute, and undo in the cloud sandbox without needing a local folder!
+
+### Deploying via Vercel Dashboard:
+1. Go to [https://vercel.com/new](https://vercel.com/new).
+2. Import your GitHub repository (`vipin-143/Taskolypse`).
+3. Leave all default settings (Framework: *Other*, Root Directory: `./`).
+4. Click **Deploy**. Vercel will install `requirements.txt` and launch your live URL!
+
+---
+
 ## 5. Features
 
 - **Fast-Paced Lane Gameplay:** Files stream in with real-time countdown progress bars.
