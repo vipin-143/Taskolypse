@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Linter and tool caches
+.ruff_cache/
+.mypy_cache/
+
+# Environment and sensitive data
+.env
+.env.*
+
+# Taskocalypse runtime artifacts
+demo_folder/
+test_data/
+*.journal.json
+.taskocalypse_journal*.json
+.taskocalypse_quarantine/
+history_overrides.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
