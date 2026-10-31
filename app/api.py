@@ -10,8 +10,6 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
 
 from app.config import (
     HOST,
@@ -222,19 +220,56 @@ def override_feedback_endpoint(payload: OverrideFeedbackRequest) -> dict[str, st
     return {"status": "recorded"}
 
 
-# Mount static files and landing page
-STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
-if not STATIC_DIR.exists():
-    STATIC_DIR = Path.cwd() / "static"
+# Static file resolution helper
+STATIC_DIRS = [
+    Path(__file__).resolve().parent.parent / "static",
+    Path.cwd() / "static",
+    Path("/var/task/static"),
+]
 
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+def find_static_file(relative_name: str) -> Path | None:
+    """Find a static file across potential local and serverless paths."""
+    for base in STATIC_DIRS:
+        target = (base / relative_name).resolve()
+        if target.exists() and target.is_file():
+            return target
+    return None
+
+
+@app.get("/static/{file_path:path}")
+def serve_static(file_path: str) -> Response:
+    """Serve static files with guaranteed explicit MIME types."""
+    target = find_static_file(file_path)
+    if not target:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Static file not found.")
+
+    content = target.read_bytes()
+    media_type = "application/octet-stream"
+    if file_path.endswith(".css"):
+        media_type = "text/css; charset=utf-8"
+    elif file_path.endswith(".js"):
+        media_type = "application/javascript; charset=utf-8"
+    elif file_path.endswith(".html"):
+        media_type = "text/html; charset=utf-8"
+    elif file_path.endswith(".svg"):
+        media_type = "image/svg+xml"
+
+    return Response(
+        content=content,
+        media_type=media_type,
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
 
 
 @app.get("/")
-def serve_index() -> FileResponse:
+def serve_index() -> Response:
     """Serve single-page frontend application."""
-    index_file = STATIC_DIR / "index.html"
-    if not index_file.exists():
+    target = find_static_file("index.html")
+    if not target:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Frontend not found.")
-    return FileResponse(str(index_file))
+    return Response(
+        content=target.read_bytes(),
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-cache"},
+    )

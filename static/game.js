@@ -6,6 +6,11 @@
 "use strict";
 
 (function () {
+  if (window.__TASKOCALYPSE_LOADED__) {
+    return;
+  }
+  window.__TASKOCALYPSE_LOADED__ = true;
+
   // Application State
   const state = {
     csrfToken: "",

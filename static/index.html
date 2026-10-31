@@ -6,6 +6,981 @@
   <meta name="description" content="Taskocalypse - Turn the chore of organizing cluttered folders into a fast-paced survival game.">
   <title>Taskocalypse - Folder Defense</title>
   <link rel="stylesheet" href="/static/style.css">
+  <style>
+/* ==========================================================================
+   Taskocalypse Theme & Stylesheet
+   Designed for Accessibility (WCAG AA), Responsiveness, and Arcade Feel
+   ========================================================================== */
+
+:root {
+  --font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  
+  /* WCAG AA High Contrast Color Palette */
+  --bg-dark: #0f141c;
+  --bg-card: #192231;
+  --bg-elevated: #233045;
+  --border-color: #3b4e6d;
+  --text-main: #f0f4fc;
+  --text-muted: #a2b4cf;
+  --text-inverse: #0b0f17;
+
+  /* Accent & Bunker Indicators */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-accent: #06b6d4;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-purple: #a855f7;
+  --color-pink: #ec4899;
+
+  /* Bunker specific distinct colors (Colorblind-safe accents) */
+  --bunker-docs: #38bdf8;
+  --bunker-images: #4ade80;
+  --bunker-videos: #f472b6;
+  --bunker-code: #fbbf24;
+  --bunker-archives: #a78bfa;
+  --bunker-installers: #fb923c;
+  --bunker-trash: #f87171;
+  --bunker-keep: #94a3b8;
+
+  --focus-ring: #60a5fa;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --transition-speed: 0.18s;
+}
+
+/* Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accessibility: Skip Link & Screen Reader Helpers */
+.skip-link {
+  position: absolute;
+  top: -3rem;
+  left: 1rem;
+  background: var(--color-warning);
+  color: #000;
+  padding: 0.6rem 1.2rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  z-index: 10000;
+  transition: top var(--transition-speed);
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus Indicators */
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Header */
+.app-header {
+  background: var(--bg-card);
+  border-bottom: 2px solid var(--border-color);
+  padding: 0.85rem 1.5rem;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.brand h1 {
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #fff;
+}
+
+.tagline {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  border-left: 1px solid var(--border-color);
+  padding-left: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Main Container */
+.app-main {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+}
+
+/* View Panels */
+.view-panel {
+  display: block;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Generic Card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Setup Card */
+.setup-card {
+  max-width: 680px;
+  margin: 1rem auto;
+}
+
+.setup-card h2 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  margin-bottom: 1.8rem;
+}
+
+.scan-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+input[type="text"] {
+  flex: 1;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+input[type="text"]:focus {
+  border-color: var(--focus-ring);
+}
+
+.form-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 0.45rem;
+}
+
+.form-hint code {
+  background: var(--bg-elevated);
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  color: var(--color-warning);
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+  background: var(--bg-elevated);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.speed-select-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+}
+
+select {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.btn-secondary:hover {
+  background: #2b3b55;
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+.btn-accent:hover {
+  background: #0891b2;
+}
+
+.btn-warning {
+  background: var(--color-warning);
+  color: var(--text-inverse);
+  font-weight: 700;
+}
+
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-large {
+  padding: 0.85rem 1.75rem;
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.btn-icon {
+  padding: 0.5rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+/* Alerts */
+.alert {
+  margin-top: 1rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+}
+
+.alert-error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid var(--color-danger);
+  color: #fca5a5;
+}
+
+.alert-success {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--color-success);
+  color: #6ee7b7;
+}
+
+/* ==========================================================================
+   GAMEPLAY ARENA
+   ========================================================================== */
+
+/* HUD */
+.game-hud {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.hud-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+
+.hud-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hud-value.highlight {
+  color: var(--color-warning);
+}
+
+.hud-value.warning {
+  color: var(--color-danger);
+}
+
+.combo-display {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.combo-value {
+  color: var(--color-pink);
+  transition: transform 0.15s ease-out;
+}
+
+.combo-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-pink);
+  text-transform: uppercase;
+}
+
+/* Arena Container & Timer */
+.arena-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.timer-track {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.timer-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--color-accent);
+  transition: width 0.05s linear;
+}
+
+.timer-fill.timer-warning {
+  background: var(--color-danger);
+}
+
+/* File Card */
+.file-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow-lg);
+  transition: transform var(--transition-speed);
+}
+
+.file-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.file-icon {
+  font-size: 2.25rem;
+}
+
+.file-meta-header {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.badge-warning {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: var(--color-danger);
+  color: #fca5a5;
+}
+
+.file-name {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  word-break: break-all;
+  margin-bottom: 0.5rem;
+}
+
+.file-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.detail-pill {
+  background: var(--bg-elevated);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* AI Suggestion Banner */
+.suggestion-banner {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.suggestion-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  letter-spacing: 0.08em;
+}
+
+.confidence-badge {
+  background: var(--color-accent);
+  color: var(--text-inverse);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.suggestion-content strong {
+  font-size: 1.05rem;
+  color: #fff;
+}
+
+.suggestion-reason {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Bunker Lanes Grid */
+.bunkers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.bunker-btn {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform var(--transition-speed), border-color var(--transition-speed), background var(--transition-speed);
+}
+
+.bunker-btn:hover {
+  background: var(--bg-elevated);
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+.bunker-btn.suggested-pulse {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.5);
+}
+
+.bunker-key-pill {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--color-warning);
+  font-size: 0.75rem;
+  font-weight: 800;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bunker-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.bunker-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.bunker-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.bunker-trash {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.bunker-trash:hover {
+  border-color: var(--color-danger);
+}
+
+.bunker-keep {
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+/* ==========================================================================
+   RUN SUMMARY & DRY RUN PLAN
+   ========================================================================== */
+
+.summary-card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.summary-banner {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.summary-badge-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.summary-banner h2 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.summary-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.stats-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1rem;
+  text-align: center;
+}
+
+.stat-number {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-warning);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Dry-Run Box & Table */
+.dry-run-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dry-run-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.safety-indicator {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--color-success);
+  color: #6ee7b7;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.dry-run-description {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.table-responsive {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+}
+
+.plan-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.plan-table th,
+.plan-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.plan-table th {
+  background: var(--bg-dark);
+  font-weight: 700;
+  color: var(--text-muted);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.action-badge {
+  display: inline-block;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.action-move {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+.action-quarantine {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+.action-keep {
+  background: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}
+
+.summary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   SUCCESS & UNDO CARD
+   ========================================================================== */
+
+.success-card {
+  max-width: 650px;
+  margin: 1rem auto;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.success-card h2 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--color-success);
+  margin-bottom: 0.5rem;
+}
+
+.undo-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.undo-box p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   MODAL DIALOG (ACCESSIBILITY & HOW TO PLAY)
+   ========================================================================== */
+
+.modal-dialog {
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  color: var(--text-main);
+  max-width: 620px;
+  width: 90%;
+  margin: auto;
+  padding: 0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}
+
+.modal-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(2px);
+}
+
+.dialog-content {
+  padding: 1.75rem;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.dialog-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.dialog-body h3 {
+  font-size: 1.05rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.45rem;
+  color: var(--color-accent);
+}
+
+.dialog-body p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.dialog-body ul {
+  padding-left: 1.25rem;
+  margin-top: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.dialog-body li {
+  margin-bottom: 0.35rem;
+  color: var(--text-muted);
+}
+
+.dialog-body strong {
+  color: var(--text-main);
+}
+
+kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.35rem;
+  font-size: 0.8rem;
+  color: var(--color-warning);
+  font-family: monospace;
+}
+
+.dialog-footer {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 1.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+/* ==========================================================================
+   MEDIA QUERIES (RESPONSIVENESS & ACCESSIBILITY)
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .tagline {
+    display: none;
+  }
+  
+  .bunkers-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .card {
+    padding: 1.25rem;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+  </style>
 </head>
 <body>
   <!-- Accessibility: Skip Link -->
@@ -371,6 +1346,811 @@
   </footer>
 
   <script src="/static/game.js"></script>
+  <script>
+/**
+ * Taskocalypse: Fast-Paced Folder Defense & Digital Chore Engine
+ * Pure Vanilla JavaScript (No Frameworks, No External Dependencies)
+ */
+
+"use strict";
+
+(function () {
+  if (window.__TASKOCALYPSE_LOADED__) {
+    return;
+  }
+  window.__TASKOCALYPSE_LOADED__ = true;
+
+  // Application State
+  const state = {
+    csrfToken: "",
+    rootPath: "",
+    files: [],
+    currentIndex: 0,
+    decisions: [],
+    score: 0,
+    combo: 1,
+    maxCombo: 1,
+    duplicatesCount: 0,
+    calmMode: false,
+    speedMs: 6000,
+    soundEnabled: true,
+    lastJournalId: null,
+    
+    // Timer state
+    timerStart: 0,
+    timerDuration: 6000,
+    timerAnimFrame: null,
+    isPaused: false,
+  };
+
+  // Bunker Mapping
+  const BUNKERS = {
+    "1": "Documents",
+    "2": "Images",
+    "3": "Videos",
+    "4": "Code",
+    "5": "Archives",
+    "6": "Installers",
+    "7": "Trash-Quarantine",
+    "8": "Keep",
+  };
+
+  // DOM Elements
+  const el = {
+    srAnnouncer: document.getElementById("sr-announcer"),
+    
+    // Header controls
+    btnSoundToggle: document.getElementById("btn-sound-toggle"),
+    btnCalmToggle: document.getElementById("btn-calm-toggle"),
+    btnHelp: document.getElementById("btn-help"),
+    helpDialog: document.getElementById("help-dialog"),
+    btnCloseHelp: document.getElementById("btn-close-help"),
+    btnDismissHelp: document.getElementById("btn-dismiss-help"),
+    
+    // Views
+    viewSetup: document.getElementById("view-setup"),
+    viewGame: document.getElementById("view-game"),
+    viewSummary: document.getElementById("view-summary"),
+    viewSuccess: document.getElementById("view-success"),
+    
+    // Setup View
+    scanForm: document.getElementById("scan-form"),
+    folderPathInput: document.getElementById("folder-path-input"),
+    btnUseDemo: document.getElementById("btn-use-demo"),
+    checkRecursive: document.getElementById("check-recursive"),
+    gameSpeedSelect: document.getElementById("game-speed-select"),
+    scanError: document.getElementById("scan-error"),
+    btnStartScan: document.getElementById("btn-start-scan"),
+    
+    // Game HUD
+    hudRemaining: document.getElementById("hud-remaining"),
+    hudScore: document.getElementById("hud-score"),
+    hudCombo: document.getElementById("hud-combo"),
+    hudComboTitle: document.getElementById("hud-combo-title"),
+    hudDuplicates: document.getElementById("hud-duplicates"),
+    
+    // Arena
+    timerTrack: document.getElementById("timer-progressbar"),
+    timerFill: document.getElementById("timer-fill"),
+    fileCard: document.getElementById("file-card"),
+    fileIcon: document.getElementById("file-icon"),
+    fileExtBadge: document.getElementById("file-ext-badge"),
+    fileDuplicateBadge: document.getElementById("file-duplicate-badge"),
+    fileName: document.getElementById("file-name"),
+    fileSize: document.getElementById("file-size"),
+    fileAge: document.getElementById("file-age"),
+    
+    // Suggestion
+    suggestionConfidence: document.getElementById("suggestion-confidence"),
+    suggestionBunkerName: document.getElementById("suggestion-bunker-name"),
+    suggestionReason: document.getElementById("suggestion-reason"),
+    btnQuickAccept: document.getElementById("btn-quick-accept"),
+    
+    // Bunker buttons
+    bunkerButtons: document.querySelectorAll(".bunker-btn"),
+    
+    // Summary
+    sumSorted: document.getElementById("sum-sorted"),
+    sumQuarantined: document.getElementById("sum-quarantined"),
+    sumSaved: document.getElementById("sum-saved"),
+    sumScore: document.getElementById("sum-score"),
+    planItemsTbody: document.getElementById("plan-items-tbody"),
+    btnExecutePlan: document.getElementById("btn-execute-plan"),
+    btnDiscardPlan: document.getElementById("btn-discard-plan"),
+    execFeedback: document.getElementById("exec-feedback"),
+    
+    // Success / Undo
+    successTitle: document.getElementById("success-title"),
+    successMessage: document.getElementById("success-message"),
+    btnUndoRun: document.getElementById("btn-undo-run"),
+    btnPlayAgain: document.getElementById("btn-play-again"),
+    undoFeedback: document.getElementById("undo-feedback"),
+  };
+
+  // ==========================================================================
+  // Web Audio API Synthesizer (Zero External Assets)
+  // ==========================================================================
+  let audioCtx = null;
+
+  function initAudio() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === "suspended") {
+      audioCtx.resume();
+    }
+  }
+
+  function playTone(freq, duration, type = "sine", gainVal = 0.1) {
+    if (!state.soundEnabled || !audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    } catch (_) {
+      // Audio fallback silent
+    }
+  }
+
+  function playSfx(name) {
+    if (!state.soundEnabled) return;
+    initAudio();
+    switch (name) {
+      case "match":
+        playTone(587.33, 0.12, "triangle", 0.15); // D5
+        setTimeout(() => playTone(880.0, 0.16, "triangle", 0.12), 60); // A5
+        break;
+      case "combo":
+        playTone(440, 0.08, "sine", 0.15);
+        setTimeout(() => playTone(659.25, 0.08, "sine", 0.15), 50);
+        setTimeout(() => playTone(880.0, 0.15, "sine", 0.2), 100);
+        break;
+      case "override":
+        playTone(330, 0.1, "sine", 0.1);
+        break;
+      case "trash":
+        playTone(180, 0.2, "sawtooth", 0.15);
+        break;
+      case "victory":
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+          setTimeout(() => playTone(freq, 0.25, "triangle", 0.18), i * 110);
+        });
+        break;
+      case "warning":
+        playTone(220, 0.08, "square", 0.08);
+        break;
+    }
+  }
+
+  // ==========================================================================
+  // Screen Reader Accessibility Announcer
+  // ==========================================================================
+  function announce(message) {
+    if (el.srAnnouncer) {
+      el.srAnnouncer.textContent = "";
+      setTimeout(() => {
+        el.srAnnouncer.textContent = message;
+      }, 50);
+    }
+  }
+
+  // ==========================================================================
+  // Helper Formatters
+  // ==========================================================================
+  function formatBytes(bytes) {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  }
+
+  function formatAge(epochSec) {
+    const diffSec = Math.max(0, (Date.now() / 1000) - epochSec);
+    const days = Math.floor(diffSec / 86400);
+    if (days === 0) return "Modified today";
+    if (days === 1) return "Modified yesterday";
+    if (days < 30) return `Modified ${days} days ago`;
+    const months = Math.floor(days / 30);
+    if (months < 12) return `Modified ${months} month${months > 1 ? "s" : ""} ago`;
+    const years = (days / 365).toFixed(1);
+    return `Modified ${years} years ago`;
+  }
+
+  function getFileIcon(ext, isDuplicate) {
+    if (isDuplicate) return "☣️";
+    const e = (ext || "").toLowerCase();
+    if ([".pdf", ".docx", ".doc", ".txt", ".xlsx"].includes(e)) return "📄";
+    if ([".jpg", ".jpeg", ".png", ".gif", ".webp"].includes(e)) return "🖼️";
+    if ([".mp4", ".mov", ".mkv", ".avi"].includes(e)) return "🎬";
+    if ([".py", ".js", ".ts", ".html", ".css", ".json"].includes(e)) return "💻";
+    if ([".zip", ".tar", ".gz", ".7z"].includes(e)) return "📦";
+    if ([".exe", ".msi", ".dmg"].includes(e)) return "⚙️";
+    return "📁";
+  }
+
+  // ==========================================================================
+  // API Calls
+  // ==========================================================================
+  async function fetchSession() {
+    try {
+      const res = await fetch("/api/session");
+      if (res.ok) {
+        const data = await res.json();
+        state.csrfToken = data.csrf_token;
+      }
+    } catch (_) {}
+  }
+
+  async function apiScanFolder(folderPath, includeSubfolders) {
+    const res = await fetch("/api/scan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        folder_path: folderPath,
+        include_subfolders: includeSubfolders,
+        max_files: 300,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Scan failed" }));
+      throw new Error(err.detail || "Scanning failed");
+    }
+    return await res.json();
+  }
+
+  async function apiGeneratePlan(rootPath, decisions) {
+    const res = await fetch("/api/plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        root_path: rootPath,
+        decisions: decisions,
+        csrf_token: state.csrfToken,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Plan generation failed" }));
+      throw new Error(err.detail || "Plan generation failed");
+    }
+    return await res.json();
+  }
+
+  async function apiExecutePlan(rootPath, items) {
+    const res = await fetch("/api/execute", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        root_path: rootPath,
+        items: items,
+        confirmed: true,
+        csrf_token: state.csrfToken,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Execution failed" }));
+      throw new Error(err.detail || "Execution failed");
+    }
+    return await res.json();
+  }
+
+  async function apiUndoRun(rootPath, journalId) {
+    const res = await fetch("/api/undo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        root_path: rootPath,
+        journal_id: journalId,
+        csrf_token: state.csrfToken,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: "Undo failed" }));
+      throw new Error(err.detail || "Undo failed");
+    }
+    return await res.json();
+  }
+
+  async function apiRecordOverride(extension, chosenBunker, originalBunker) {
+    try {
+      await fetch("/api/override", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          extension: extension,
+          chosen_bunker: chosenBunker,
+          original_bunker: originalBunker,
+          csrf_token: state.csrfToken,
+        }),
+      });
+    } catch (_) {}
+  }
+
+  // ==========================================================================
+  // Views Navigation
+  // ==========================================================================
+  function showView(viewName) {
+    [el.viewSetup, el.viewGame, el.viewSummary, el.viewSuccess].forEach((v) => {
+      v.classList.add("hidden");
+    });
+    if (viewName === "setup") el.viewSetup.classList.remove("hidden");
+    if (viewName === "game") el.viewGame.classList.remove("hidden");
+    if (viewName === "summary") el.viewSummary.classList.remove("hidden");
+    if (viewName === "success") el.viewSuccess.classList.remove("hidden");
+  }
+
+  // ==========================================================================
+  // Game Loop & Card Presentation
+  // ==========================================================================
+  function startDefense(scanResponse) {
+    state.rootPath = scanResponse.root_path;
+    state.files = scanResponse.files;
+    state.csrfToken = scanResponse.csrf_token;
+    state.currentIndex = 0;
+    state.decisions = [];
+    state.score = 0;
+    state.combo = 1;
+    state.maxCombo = 1;
+    state.duplicatesCount = scanResponse.duplicate_count;
+
+    if (state.files.length === 0) {
+      alert("No files found to organize in the chosen folder!");
+      return;
+    }
+
+    showView("game");
+    updateHud();
+    presentCurrentCard();
+  }
+
+  function updateHud() {
+    el.hudRemaining.textContent = `${state.files.length - state.currentIndex} / ${state.files.length}`;
+    el.hudScore.textContent = state.score.toLocaleString();
+    el.hudCombo.textContent = `x${state.combo}`;
+    el.hudDuplicates.textContent = state.duplicatesCount;
+
+    // Combo title
+    if (state.combo >= 8) el.hudComboTitle.textContent = "RAMPAGE!";
+    else if (state.combo >= 5) el.hudComboTitle.textContent = "ON FIRE!";
+    else if (state.combo >= 3) el.hudComboTitle.textContent = "STREAK!";
+    else el.hudComboTitle.textContent = "READY";
+  }
+
+  function presentCurrentCard() {
+    if (state.currentIndex >= state.files.length) {
+      endRun();
+      return;
+    }
+
+    const current = state.files[state.currentIndex];
+    const file = current.file;
+    const suggestion = current.suggestion;
+
+    // Render safely using textContent
+    el.fileName.textContent = file.name;
+    el.fileName.title = file.relative_path;
+    el.fileIcon.textContent = getFileIcon(file.extension, file.is_duplicate);
+    el.fileExtBadge.textContent = file.extension ? file.extension.toUpperCase() : "FILE";
+
+    if (file.is_duplicate) {
+      el.fileDuplicateBadge.classList.remove("hidden");
+    } else {
+      el.fileDuplicateBadge.classList.add("hidden");
+    }
+
+    el.fileSize.textContent = formatBytes(file.size_bytes);
+    el.fileAge.textContent = formatAge(file.mtime);
+
+    // Suggestion banner
+    const confPct = Math.round(suggestion.confidence * 100);
+    el.suggestionConfidence.textContent = `${confPct}% Match`;
+    el.suggestionBunkerName.textContent = `Suggested: ${suggestion.bunker}`;
+    el.suggestionReason.textContent = suggestion.reason;
+
+    // Highlight suggested bunker button
+    el.bunkerButtons.forEach((btn) => {
+      btn.classList.remove("suggested-pulse");
+      if (btn.getAttribute("data-bunker") === suggestion.bunker) {
+        btn.classList.add("suggested-pulse");
+      }
+    });
+
+    // Screen reader announcement
+    announce(
+      `File ${state.currentIndex + 1} of ${state.files.length}: ${file.name}, ${formatBytes(file.size_bytes)}. ` +
+      `Suggested bunker: ${suggestion.bunker}. Reason: ${suggestion.reason}`
+    );
+
+    // Reset and start countdown timer
+    resetCountdown();
+  }
+
+  function resetCountdown() {
+    if (state.timerAnimFrame) {
+      cancelAnimationFrame(state.timerAnimFrame);
+      state.timerAnimFrame = null;
+    }
+
+    if (state.calmMode) {
+      el.timerFill.style.width = "100%";
+      el.timerFill.classList.remove("timer-warning");
+      el.timerTrack.setAttribute("aria-valuenow", "100");
+      return;
+    }
+
+    state.timerDuration = state.speedMs;
+    state.timerStart = performance.now();
+
+    function stepTimer(now) {
+      const elapsed = now - state.timerStart;
+      const remainingPct = Math.max(0, 1 - (elapsed / state.timerDuration));
+
+      el.timerFill.style.width = `${remainingPct * 100}%`;
+      el.timerTrack.setAttribute("aria-valuenow", Math.round(remainingPct * 100).toString());
+
+      if (remainingPct < 0.25) {
+        el.timerFill.classList.add("timer-warning");
+      } else {
+        el.timerFill.classList.remove("timer-warning");
+      }
+
+      if (remainingPct <= 0) {
+        // Time expired: auto-assign suggestion to keep pace
+        handleCardDecision(state.files[state.currentIndex].suggestion.bunker, false, true);
+        return;
+      }
+
+      state.timerAnimFrame = requestAnimationFrame(stepTimer);
+    }
+
+    state.timerAnimFrame = requestAnimationFrame(stepTimer);
+  }
+
+  function handleCardDecision(chosenBunker, isOverrideExplicit = false, isTimeout = false) {
+    if (state.timerAnimFrame) {
+      cancelAnimationFrame(state.timerAnimFrame);
+      state.timerAnimFrame = null;
+    }
+
+    const current = state.files[state.currentIndex];
+    const suggestion = current.suggestion;
+    const isMatch = (chosenBunker === suggestion.bunker);
+
+    // Score calculation
+    let basePoints = 100;
+    if (isMatch) {
+      state.combo += 1;
+      if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+      state.score += basePoints * state.combo;
+      playSfx(state.combo % 3 === 0 ? "combo" : "match");
+    } else {
+      // Overrode suggestion
+      state.combo = 1;
+      state.score += basePoints;
+      playSfx("override");
+      // Record override feedback asynchronously to adapt heuristics
+      apiRecordOverride(current.file.extension, chosenBunker, suggestion.bunker);
+    }
+
+    if (chosenBunker === "Trash-Quarantine") {
+      playSfx("trash");
+    }
+
+    // Record decision
+    state.decisions.push({
+      relative_path: current.file.relative_path,
+      bunker: chosenBunker,
+      override: !isMatch,
+    });
+
+    state.currentIndex += 1;
+    updateHud();
+
+    // Visual card transition
+    el.fileCard.style.transform = "scale(0.96)";
+    setTimeout(() => {
+      el.fileCard.style.transform = "none";
+      presentCurrentCard();
+    }, 90);
+  }
+
+  // ==========================================================================
+  // Summary & Dry-Run Plan
+  // ==========================================================================
+  async function endRun() {
+    playSfx("victory");
+    showView("summary");
+
+    announce("Defense run complete! Generating dry-run action preview.");
+    el.btnExecutePlan.disabled = true;
+    el.btnExecutePlan.textContent = "Generating Plan...";
+
+    try {
+      const plan = await apiGeneratePlan(state.rootPath, state.decisions);
+      populateSummaryView(plan);
+    } catch (err) {
+      el.execFeedback.textContent = `Error building plan: ${err.message}`;
+      el.execFeedback.classList.remove("hidden");
+      el.execFeedback.classList.add("alert-error");
+    } finally {
+      el.btnExecutePlan.disabled = false;
+      el.btnExecutePlan.innerHTML = '<span aria-hidden="true">⚡</span> Execute Plan on Disk';
+    }
+  }
+
+  function populateSummaryView(plan) {
+    el.sumSorted.textContent = plan.items.length.toString();
+    el.sumQuarantined.textContent = plan.total_quarantined.toString();
+    el.sumSaved.textContent = formatBytes(plan.bytes_saved);
+    el.sumScore.textContent = state.score.toLocaleString();
+
+    // Clear and safely populate plan items table using textContent
+    el.planItemsTbody.innerHTML = "";
+    plan.items.forEach((item) => {
+      const tr = document.createElement("tr");
+
+      // Action cell
+      const tdAction = document.createElement("td");
+      const badge = document.createElement("span");
+      badge.className = `action-badge action-${item.action}`;
+      badge.textContent = item.action;
+      tdAction.appendChild(badge);
+
+      // Source cell
+      const tdSource = document.createElement("td");
+      tdSource.textContent = item.source_path;
+
+      // Target cell
+      const tdTarget = document.createElement("td");
+      tdTarget.textContent = item.target_path || "(Stay in place)";
+
+      // Size cell
+      const tdSize = document.createElement("td");
+      tdSize.textContent = formatBytes(item.size_bytes);
+
+      tr.appendChild(tdAction);
+      tr.appendChild(tdSource);
+      tr.appendChild(tdTarget);
+      tr.appendChild(tdSize);
+      el.planItemsTbody.appendChild(tr);
+    });
+
+    state.currentPlan = plan;
+  }
+
+  async function executeActionPlan() {
+    if (!state.currentPlan) return;
+
+    el.btnExecutePlan.disabled = true;
+    el.btnExecutePlan.textContent = "Applying Changes to Disk...";
+    el.execFeedback.classList.add("hidden");
+
+    try {
+      const result = await apiExecutePlan(state.rootPath, state.currentPlan.items);
+      if (result.success) {
+        state.lastJournalId = result.journal_id;
+        showView("success");
+        el.successMessage.textContent = result.message;
+        announce(`Disk organization executed successfully! ${result.message}`);
+      } else {
+        el.execFeedback.textContent = `Execution warning: ${result.message}`;
+        el.execFeedback.className = "alert alert-error";
+        el.execFeedback.classList.remove("hidden");
+      }
+    } catch (err) {
+      el.execFeedback.textContent = `Execution error: ${err.message}`;
+      el.execFeedback.className = "alert alert-error";
+      el.execFeedback.classList.remove("hidden");
+    } finally {
+      el.btnExecutePlan.disabled = false;
+      el.btnExecutePlan.innerHTML = '<span aria-hidden="true">⚡</span> Execute Plan on Disk';
+    }
+  }
+
+  async function handleUndo() {
+    if (!state.lastJournalId) return;
+
+    el.btnUndoRun.disabled = true;
+    el.btnUndoRun.textContent = "Restoring Files...";
+    el.undoFeedback.classList.add("hidden");
+
+    try {
+      const result = await apiUndoRun(state.rootPath, state.lastJournalId);
+      el.undoFeedback.textContent = result.message;
+      el.undoFeedback.className = result.success ? "alert alert-success" : "alert alert-error";
+      el.undoFeedback.classList.remove("hidden");
+      if (result.success) {
+        el.btnUndoRun.classList.add("hidden");
+        announce(result.message);
+      }
+    } catch (err) {
+      el.undoFeedback.textContent = `Undo failed: ${err.message}`;
+      el.undoFeedback.className = "alert alert-error";
+      el.undoFeedback.classList.remove("hidden");
+    } finally {
+      el.btnUndoRun.disabled = false;
+      el.btnUndoRun.innerHTML = '<span aria-hidden="true">↩️</span> Undo This Run (Press Z)';
+    }
+  }
+
+  // ==========================================================================
+  // Event Listeners & Keyboard Controls
+  // ==========================================================================
+  function setupEventListeners() {
+    // Session token initialization
+    fetchSession();
+
+    // Use Demo Folder Button
+    el.btnUseDemo.addEventListener("click", () => {
+      // Set to demo_folder in root
+      el.folderPathInput.value = "demo_folder";
+      el.folderPathInput.focus();
+    });
+
+    // Scan Form Submission
+    el.scanForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      initAudio();
+      el.scanError.classList.add("hidden");
+      el.btnStartScan.disabled = true;
+      el.btnStartScan.textContent = "Scanning...";
+
+      const folderPath = el.folderPathInput.value.trim();
+      const includeSubfolders = el.checkRecursive.checked;
+      const speedVal = el.gameSpeedSelect.value;
+
+      if (speedVal === "calm") {
+        state.calmMode = true;
+      } else {
+        state.calmMode = false;
+        state.speedMs = parseInt(speedVal, 10);
+      }
+
+      try {
+        const scanRes = await apiScanFolder(folderPath, includeSubfolders);
+        startDefense(scanRes);
+      } catch (err) {
+        el.scanError.textContent = err.message;
+        el.scanError.classList.remove("hidden");
+      } finally {
+        el.btnStartScan.disabled = false;
+        el.btnStartScan.innerHTML = '<span aria-hidden="true">🚀</span> Scan & Start Defense';
+      }
+    });
+
+    // Accept Suggestion Button
+    el.btnQuickAccept.addEventListener("click", () => {
+      if (state.files[state.currentIndex]) {
+        handleCardDecision(state.files[state.currentIndex].suggestion.bunker, false);
+      }
+    });
+
+    // Bunker Lane Buttons (Click / Tap)
+    el.bunkerButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const bunker = btn.getAttribute("data-bunker");
+        handleCardDecision(bunker, true);
+      });
+    });
+
+    // Sound toggle
+    el.btnSoundToggle.addEventListener("click", () => {
+      state.soundEnabled = !state.soundEnabled;
+      el.btnSoundToggle.setAttribute("aria-pressed", state.soundEnabled.toString());
+      el.btnSoundToggle.querySelector(".btn-label").textContent = `Sound: ${state.soundEnabled ? "ON" : "OFF"}`;
+      el.btnSoundToggle.querySelector(".btn-icon-symbol").textContent = state.soundEnabled ? "🔊" : "🔇";
+      if (state.soundEnabled) playSfx("match");
+    });
+
+    // Calm mode toggle
+    el.btnCalmToggle.addEventListener("click", () => {
+      state.calmMode = !state.calmMode;
+      el.btnCalmToggle.setAttribute("aria-pressed", state.calmMode.toString());
+      el.btnCalmToggle.querySelector(".btn-label").textContent = `Calm Mode: ${state.calmMode ? "ON" : "OFF"}`;
+      resetCountdown();
+    });
+
+    // Help Dialog
+    el.btnHelp.addEventListener("click", () => el.helpDialog.showModal());
+    el.btnCloseHelp.addEventListener("click", () => el.helpDialog.close());
+    el.btnDismissHelp.addEventListener("click", () => el.helpDialog.close());
+
+    // Execute plan
+    el.btnExecutePlan.addEventListener("click", executeActionPlan);
+
+    // Discard plan
+    el.btnDiscardPlan.addEventListener("click", () => {
+      if (confirm("Discard queued actions? No files on disk will be changed.")) {
+        showView("setup");
+      }
+    });
+
+    // Undo button
+    el.btnUndoRun.addEventListener("click", handleUndo);
+
+    // Play again
+    el.btnPlayAgain.addEventListener("click", () => {
+      showView("setup");
+      el.btnUndoRun.classList.remove("hidden");
+      el.undoFeedback.classList.add("hidden");
+    });
+
+    // Global Keyboard Navigation
+    window.addEventListener("keydown", (e) => {
+      // Don't intercept when user is typing inside text input
+      if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") {
+        return;
+      }
+
+      // Help toggle
+      if (e.key === "?") {
+        e.preventDefault();
+        if (el.helpDialog.open) el.helpDialog.close();
+        else el.helpDialog.showModal();
+        return;
+      }
+
+      // Calm mode toggle
+      if (e.key.toLowerCase() === "c" && !el.helpDialog.open) {
+        el.btnCalmToggle.click();
+        return;
+      }
+
+      // Sound toggle
+      if (e.key.toLowerCase() === "m" && !el.helpDialog.open) {
+        el.btnSoundToggle.click();
+        return;
+      }
+
+      // Undo hotkey
+      if (e.key.toLowerCase() === "z" && !el.helpDialog.open) {
+        if (!el.viewSuccess.classList.contains("hidden") && !el.btnUndoRun.classList.contains("hidden")) {
+          e.preventDefault();
+          handleUndo();
+          return;
+        }
+      }
+
+      // During active gameplay
+      if (!el.viewGame.classList.contains("hidden") && !el.helpDialog.open) {
+        // Quick Accept: Space or Enter
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          if (state.files[state.currentIndex]) {
+            handleCardDecision(state.files[state.currentIndex].suggestion.bunker, false);
+          }
+          return;
+        }
+
+        // Bunker number hotkeys: 1 - 8
+        if (BUNKERS[e.key]) {
+          e.preventDefault();
+          handleCardDecision(BUNKERS[e.key], true);
+          return;
+        }
+      }
+    });
+  }
+
+  // Initialize on DOM ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupEventListeners);
+  } else {
+    setupEventListeners();
+  }
+})();
+
+  </script>
 </body>
 </html>
 
