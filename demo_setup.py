@@ -21,7 +21,9 @@ def create_demo_folder(base_dir: Path | None = None) -> Path:
 
     # 2. Images & Screenshots
     png_header = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR"
-    (target_dir / "Screenshot 2024-01-15 at 14.30.00.png").write_bytes(png_header + b"fake png data")
+    (target_dir / "Screenshot 2024-01-15 at 14.30.00.png").write_bytes(
+        png_header + b"fake png data"
+    )
     (target_dir / "vacation_sunset.jpg").write_bytes(b"\xff\xd8\xff\xe0\x00\x10JFIF" + b"fake jpg")
     (target_dir / "Screen Shot 2024-02-20.png").write_bytes(png_header + b"fake screenshot 2")
 
